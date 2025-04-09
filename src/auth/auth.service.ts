@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { TokenPayload } from './token-payload.interface';
 import { User } from 'src/users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
@@ -27,6 +27,15 @@ export class AuthService {
       httpOnly: true,
       expires,
     });
+  }
+
+  verifyWs(request: Request) {
+    const coookies: string[] = request.headers.cookie.split('; ');
+    const authCookie = coookies.find((cookie) =>
+      cookie.includes('Authentication'),
+    );
+    const jwt = authCookie.split('Authentication=')[1];
+    return this.jwtService.verify(jwt);
   }
 
   logout(response: Response) {
